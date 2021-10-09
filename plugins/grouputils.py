@@ -8,12 +8,10 @@
 
 
 import asyncio
-import os
 import time
 from asyncio import sleep
-
 from pyrogram.types import ChatPermissions
-import pyrogram
+import os
 from main_startup.core.decorators import friday_on_cmd
 from main_startup.helper_func.basic_helpers import (
     edit_or_reply,
@@ -22,12 +20,12 @@ from main_startup.helper_func.basic_helpers import (
     get_user,
     is_admin_or_owner,
 )
-from main_startup.helper_func.logger_s import LogIt
 from main_startup.helper_func.plugin_helpers import (
     convert_to_image,
     convert_vid_to_vidnote,
     generate_meme,
 )
+from main_startup.helper_func.logger_s import LogIt
 
 
 @friday_on_cmd(
@@ -39,21 +37,12 @@ from main_startup.helper_func.plugin_helpers import (
     },
 )
 async def spin(client, message):
-    engine = message.Engine
     if not message.reply_to_message:
-        await edit_or_reply(message, engine.get_string("REPLY_TO_PIN"))
-    try:
-        await client.pin_chat_message(
-            message.chat.id,
-            message.reply_to_message.message_id,
-            disable_notification=True,
-        )
-    except BaseException as e:
-        await edit_or_reply(
-            message, engine.get_string("UNABLE_TO_PIN").format(e)
-        )
-        return
-    await edit_or_reply(message, engine.get_string("PINNED"))
+        await edit_or_reply(message, "`Reply To A Message To Pin!`")
+    await client.pin_chat_message(
+        message.chat.id, message.reply_to_message.message_id, disable_notification=True
+    )
+    await edit_or_reply(message, "`I Have Pinned This Message!`")
 
 
 @friday_on_cmd(
@@ -65,19 +54,10 @@ async def spin(client, message):
     },
 )
 async def lpin(client, message):
-    engine = message.Engine
     if not message.reply_to_message:
-        await edit_or_reply(message, engine.get_string("REPLY_TO_PIN"))
-    try:
-        await client.pin_chat_message(
-            message.chat.id, message.reply_to_message.message_id
-        )
-    except BaseException as e:
-        await edit_or_reply(
-            message, engine.get_string("UNABLE_TO_PIN").format(e)
-        )
-        return
-    await edit_or_reply(message, engine.get_string("PINNED"))
+        await edit_or_reply(message, "`Reply To A Message To Pin!`")
+    await client.pin_chat_message(message.chat.id, message.reply_to_message.message_id)
+    await edit_or_reply(message, "`Message Pinned Successfully!`")
 
 
 @friday_on_cmd(
@@ -86,9 +66,8 @@ async def lpin(client, message):
     cmd_help={"help": "Unpin All Pinned Messages!", "example": "{ch}rmpins"},
 )
 async def dpins(client, message):
-    engine = message.Engine
     await client.unpin_all_chat_messages(message.chat.id)
-    await edit_or_reply(message, engine.get_string("UNPINNED"))
+    await edit_or_reply(message, "`All Pinned Messages Unpinned Successfully!`")
 
 
 @friday_on_cmd(
@@ -96,22 +75,21 @@ async def dpins(client, message):
     cmd_help={"help": "Get Adminlist Of Chat!", "example": "{ch}adminlist"},
 )
 async def midhunadmin(client, message):
-    engine = message.Engine
     mentions = ""
-    starky = get_text(message) or message.chat.id
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    starky = get_text(message) if get_text(message) else message.chat.id
+    pablo = await edit_or_reply(message, "`Searching For Admins!`")
     try:
         X = await client.get_chat_members(starky, filter="administrators")
         ujwal = await client.get_chat(starky)
     except BaseException as e:
-        await pablo.edit(engine.get_string("CANT_FETCH_ADMIN").format("Admins", e))
+        await pablo.edit(f"Couldn't Fetch Chat Admins, \n\n**TraceBack :** `{e}`")
         return
     for midhun in X:
         if not midhun.user.is_deleted:
             link = f'✱ <a href="tg://user?id={midhun.user.id}">{midhun.user.first_name}</a>'
             userid = f"<code>{midhun.user.id}</code>"
             mentions += f"\n{link} {userid}"
-    holy = ujwal.username or ujwal.id
+    holy = ujwal.username if ujwal.username else ujwal.id
     messag = f"""
 <b>Admins in {ujwal.title} | {holy}</b>
 
@@ -119,7 +97,7 @@ async def midhunadmin(client, message):
 """
     await edit_or_send_as_file(
         messag,
-        pablo,
+        message,
         client,
         f"`AdminList Of {holy}!`",
         "admin-lookup-result",
@@ -133,16 +111,17 @@ async def midhunadmin(client, message):
     cmd_help={"help": "Get List Of Bots In Chat!", "example": "{ch}botlist"},
 )
 async def bothub(client, message):
-    engine = message.Engine
     buts = "**Bot List** \n\n"
-    starky = get_text(message) or message.chat.id
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    nos = 0
+    starky = get_text(message) if get_text(message) else message.chat.id
+    pablo = await edit_or_reply(message, "`Searching For Bots!`")
     try:
         bots = await client.get_chat_members(starky, filter="bots")
     except BaseException as e:
-        await pablo.edit(engine.get_string("CANT_FETCH_ADMIN").format("Bots", e))
+        await pablo.edit(f"Couldn't Fetch Chat Admins, \n**TraceBack :** `{e}`")
         return
-    for nos, ujwal in enumerate(bots, start=1):
+    for ujwal in bots:
+        nos += 1
         buts += f"{nos}〉 [{ujwal.user.first_name}](tg://user?id={ujwal.user.id}) \n"
     await pablo.edit(buts)
 
@@ -155,8 +134,7 @@ async def bothub(client, message):
     },
 )
 async def ujwalzombie(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    pablo = await edit_or_reply(message, "`Searching For Zombies 🧟 .....`")
     if len(message.text.split()) == 1:
         dm = 0
         da = 0
@@ -172,24 +150,26 @@ async def ujwalzombie(client, message):
                     dc += 1
         text = "**Zombies Report!** \n\n"
         if dm > 0:
-            text += engine.get_string("TOTAL_ZOMBIES_USERS").format(dm)
+            text += f"**Total Zombies (Members) :** `{dm}` \n"
         if da > 0:
-            text += engine.get_string("TOTAL_ZOMBIES_ADMINS").format(da)
+            text += f"\n**Total Zombies (Admins) :** `{da}` \n"
         if dc > 0:
-            text += engine.get_string("GRP_OWNER_IS_ZOMBIE")
+            text += "\n__This Group Owner Deleted His Account :/__ \n"
         d = dm + da + dc
         if d > 0:
-            text += (engine.get_string("WIPE_THEM"))
+            text += (
+                "\n\nClean These Deleted Accounts By Using `.zombies clean` Command!"
+            )
             await pablo.edit(text)
         else:
-            await pablo.edit(engine.get_string("NO_ZOMBIES"))
+            await pablo.edit("No Zombies Found. Group is Clean 😊")
         return
     sgname = message.text.split(None, 1)[1]
     if sgname.lower().strip() == "clean":
-        me = client.me
+        me = await client.get_me()
         lol = await is_admin_or_owner(message, me.id)
         if not lol:
-            await pablo.edit(engine.get_string("NOT_ADMIN"))
+            await pablo.edit("`I am not an admin here!`")
             return
         s = 0
         f = 0
@@ -202,9 +182,11 @@ async def ujwalzombie(client, message):
                     f += 1
         text = ""
         if s > 0:
-            text += engine.get_string("REMOVED_ZOMBIES").format(s)
+            text += f"Successfully Removed {s} Zombies"
         if f > 0:
-            text += (engine.get_string("FAILED_ZOMBIES").format(f))
+            text += (
+                f"\nFailed to remove {f} zombies as they are either admins or creator"
+            )
         await pablo.edit(text)
 
 
@@ -218,38 +200,39 @@ async def ujwalzombie(client, message):
     },
 )
 async def ban_world(client, message):
-    engine = message.Engine
-    bun = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    bun = await edit_or_reply(message, "`Trying To Ban User!`")
+    me_m = await client.get_me()
     me_ = await message.chat.get_member(int(me_m.id))
     if not me_.can_restrict_members:
-        await bun.edit(engine.get_string("NOT_ADMIN"))
+        await bun.edit("`Boss, You Don't Have Ban Permission!`")
         return
     text_ = get_text(message)
     userk, reason = get_user(message, text_)
     if not userk:
-        await bun.edit(engine.get_string("TO_DO").format("Ban"))
+        await bun.edit("`Bruh, Please Reply To User / Give Me Username of ID To Ban!`")
         return
     try:
         user_ = await client.get_users(userk)
-    except BaseException as e:
-        await bun.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await bun.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     userz = user_.id
     if not reason:
         reason = "Not Specified!"
     if userz == me_m.id:
-        await bun.edit(engine.get_string("TF_DO_IT").format("Ban"))
+        await bun.edit("`🙄 Nice Idea, Lets Leave This Chat!`")
         return
     try:
         user_ = await client.get_users(userz)
-    except BaseException as e:
-        await bun.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await bun.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     try:
         await client.kick_chat_member(message.chat.id, int(user_.id))
-    except BaseException as e:
-        await bun.edit(engine.get_string("FAILED_ADMIN_ACTION").format("Ban", e))
+    except BaseException:
+        await bun.edit(
+            f"`I Wasn't Able To Ban That User, Maybe Because That User Doesn't Exists Or He is Promoted By SomeOne Else Or Else is Chat Creator!`"
+        )
         return
     b = f"**#Banned** \n**User :** [{user_.first_name}](tg://user?id={user_.id}) \n**Chat :** `{message.chat.title}` \n**Reason :** `{reason}`"
     await bun.edit(b)
@@ -267,35 +250,37 @@ async def ban_world(client, message):
     },
 )
 async def unban_world(client, message):
-    engine = message.Engine
-    unbun = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    unbun = await edit_or_reply(message, "`Trying To Un-Ban User!`")
+    me_m = await client.get_me()
     me_ = await message.chat.get_member(int(me_m.id))
     if not me_.can_restrict_members:
-        await unbun.edit(engine.get_string("NOT_ADMIN"))
+        await unbun.edit("`Boss, You Don't Have Un-Ban Permission!`")
         return
     text_ = get_text(message)
     userm, reason = get_user(message, text_)
     if not userm:
         await unbun.edit(
-            engine.get_string("TO_DO").format("Un-Ban")
+            "`Bruh, Please Reply To User / Give Me Username of ID To UnBan!`"
         )
         return
     try:
         user_ = await client.get_users(userm)
-    except BaseException as e:
-        await unbun.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await unbun.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     userz = user_.id
     if not reason:
         reason = "Not Specified!"
     if userz == me_m.id:
-        await unbun.edit(engine.get_string("TF_DO_IT").format("Un-Ban"))
+        await unbun.edit("`🙄 Nice Idea, Lets Un-Ban Myself!`")
         return
     try:
         await client.unban_chat_member(message.chat.id, int(user_.id))
-    except BaseException as e:
-        await unbun.edit(engine.get_string("FAILED_ADMIN_ACTION").format("Un-Ban", e))
+    except BaseException:
+        await unbun.edit(
+            f"`I Wasn't Able To Un-Ban That User, Maybe Because That User Doesn't Exists Or He is Promoted By SomeOne Else Or Else is Chat Creator!`"
+        )
+        return
     ub = f"**#UnBanned** \n**User :** [{user_.first_name}](tg://user?id={user_.id}) \n**Chat :** `{message.chat.title}` \n**Reason :** `{reason}`"
     await unbun.edit(ub)
     log = LogIt(message)
@@ -312,30 +297,29 @@ async def unban_world(client, message):
     },
 )
 async def ujwal_mote(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    pablo = await edit_or_reply(message, "`Trying To Promote User!`")
+    me_m = await client.get_me()
     me_ = await message.chat.get_member(int(me_m.id))
     if not me_.can_promote_members:
-        await pablo.edit(engine.get_string("NOT_ADMIN"))
+        await pablo.edit("`Boss, You Don't Have Promote Permission!`")
         return
     asplit = get_text(message)
     userl, Res = get_user(message, asplit)
     if not userl:
         await pablo.edit(
-            engine.get_string("TO_DO").format("Promote")
+            "`Bruh, Please Reply To User / Give Me Username of ID To Promote!`"
         )
         return
     try:
         user = await client.get_users(userl)
-    except BaseException as e:
-        await pablo.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await pablo.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     userz = user.id
     if not Res:
         Res = "Admeme"
     if userz == me_m.id:
-        await pablo.edit(engine.get_string("TF_DO_IT").format("Promote"))
+        await pablo.edit("`🙄 Nice Idea, Lets Self Promote!`")
         return
     try:
         await client.promote_chat_member(
@@ -348,10 +332,12 @@ async def ujwal_mote(client, message):
             can_pin_messages=me_.can_pin_messages,
             can_promote_members=me_.can_promote_members,
         )
-    except BaseException as e:
-        await pablo.edit(engine.get_string("FAILED_ADMIN_ACTION").format("Promote", e))
+    except:
+        await pablo.edit(
+            "`I Wasn't Able To Promote This User. This Could Be Due To (Already Admin / Owner Of The Chat)!`"
+        )
         return
-    p = f"**#Promote** \n**User :** {user.mention} \n**Chat :** `{message.chat.title}` \n**Title :** `{Res}`"
+    p = f"**#Promote** \n**User :** [{user.first_name}](tg://user?id={user.id}) \n**Chat :** `{message.chat.title}` \n**Title :** `{Res}`"
     await pablo.edit(p)
     log = LogIt(message)
     await log.log_msg(client, p)
@@ -372,44 +358,45 @@ async def ujwal_mote(client, message):
     },
 )
 async def ujwal_demote(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    pablo = await edit_or_reply(message, "`Trying To Demote User!`")
+    me_m = await client.get_me()
     await message.chat.get_member(int(me_m.id))
     asplit = get_text(message)
     usero = get_user(message, asplit)[0]
     if not usero:
         await pablo.edit(
-            engine.get_string("TO_DO").format("Demote")
+            "`Bruh, Please Reply To User / Give Me Username of ID To Demote!`"
         )
         return
     try:
         user = await client.get_users(usero)
-    except BaseException as e:
-        await pablo.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await pablo.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     userz = user.id
     if userz == me_m.id:
-        await pablo.edit(engine.get_string("TF_DO_IT").format("Demote"))
+        await pablo.edit("`🙄 Nice Idea, Lets Self Demote!`")
         return
     try:
         await client.promote_chat_member(
             message.chat.id,
             user.id,
-            is_anonymous=None,
-            can_change_info=None,
-            can_post_messages=None,
-            can_edit_messages=None,
-            can_delete_messages=None,
-            can_restrict_members=None,
-            can_invite_users=None,
-            can_pin_messages=None,
-            can_promote_members=None,
+            is_anonymous=False,
+            can_change_info=False,
+            can_post_messages=False,
+            can_edit_messages=False,
+            can_delete_messages=False,
+            can_restrict_members=False,
+            can_invite_users=False,
+            can_pin_messages=False,
+            can_promote_members=False,
         )
-    except BaseException as e:
-        await pablo.edit(engine.get_string("FAILED_ADMIN_ACTION").format("Demote", e))
+    except:
+        await pablo.edit(
+            "`Unable To Demote User, This Could Be Because He is Owner Of the Chat or Is Promoted By Some On Else!`"
+        )
         return
-    d = f"**#Demote** \n**User :** {user.mention}\n**Chat :** `{message.chat.title}`"
+    d = f"**#Demote** \n**User :** [{user.first_name}](tg://user?id={user.id}) \n**Chat :** `{message.chat.title}`"
     await pablo.edit(d)
     log = LogIt(message)
     await log.log_msg(client, d)
@@ -425,35 +412,36 @@ async def ujwal_demote(client, message):
     },
 )
 async def ujwal_mute(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    pablo = await edit_or_reply(message, "`Trying To Mute User!`")
+    me_m = await client.get_me()
     me_ = await message.chat.get_member(int(me_m.id))
     if not me_.can_restrict_members:
-        await pablo.edit(engine.get_string("NOT_ADMIN"))
+        await pablo.edit("`Boss, You Don't Have Mute Permission!`")
         return
     asplit = get_text(message)
     userf = get_user(message, asplit)[0]
     if not userf:
         await pablo.edit(
-            engine.get_string("TO_DO").format("Mute")
+            "`Bruh, Please Reply To User / Give Me Username of ID To Mute!`"
         )
         return
     try:
         user = await client.get_users(userf)
-    except BaseException as e:
-        await pablo.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await pablo.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     userz = user.id
     if userz == me_m.id:
-        await pablo.edit(engine.get_string("TF_DO_IT").format("Mute"))
+        await pablo.edit("`🙄 Nice Idea, Lets Self Mute!`")
         return
     try:
         await client.restrict_chat_member(
             message.chat.id, user.id, ChatPermissions(can_send_messages=False)
         )
-    except BaseException as e:
-        await pablo.edit(engine.get_string("FAILED_ADMIN_ACTION").format("Mute", e))
+    except:
+        await pablo.edit(
+            "`I Wasn't Able To Mute User, Maybe Because He is Chat Owner Or Is Admin!`"
+        )
         return
     m = f"**#Muted** \n**User :** [{user.first_name}](tg://user?id={user.id}) \n**Chat :** `{message.chat.title}`"
     await pablo.edit(m)
@@ -471,35 +459,36 @@ async def ujwal_mute(client, message):
     },
 )
 async def ujwal_unmute(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    pablo = await edit_or_reply(message, "`Trying To Un-Mute User!`")
+    me_m = await client.get_me()
     me_ = await message.chat.get_member(int(me_m.id))
     if not me_.can_restrict_members:
-        await pablo.edit(engine.get_string("NOT_ADMIN"))
+        await pablo.edit("`Boss, You Don't Have Un-Mute Permission!`")
         return
     asplit = get_text(message)
     userf = get_user(message, asplit)[0]
     if not userf:
         await pablo.edit(
-            engine.get_string("TO_DO").format("Un-Mute")
+            "`Bruh, Please Reply To User / Give Me Username of ID To Unmute!`"
         )
         return
     try:
         user = await client.get_users(userf)
-    except BaseException as e:
-        await pablo.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await pablo.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     userz = user.id
     if userz == me_m.id:
-        await pablo.edit(engine.get_string("TF_DO_IT").format("un-mute"))
+        await pablo.edit("`🙄 Nice Idea, Lets Self Un-Mute!`")
         return
     try:
         await client.restrict_chat_member(
             message.chat.id, user.id, ChatPermissions(can_send_messages=True)
         )
-    except BaseException as e:
-        await pablo.edit(engine.get_string("FAILED_ADMIN_ACTION").format("Un-mute", e))
+    except:
+        await pablo.edit(
+            "`I Wasn't Able To Un-Mute User, Maybe Because He is Chat Owner Or Is Not Even Muted!`"
+        )
         return
     um = f"**#Un_Muted** \n**User :** [{user.first_name}](tg://user?id={user.id}) \n**Chat :** `{message.chat.title}`"
     await pablo.edit(um)
@@ -513,17 +502,13 @@ async def ujwal_unmute(client, message):
     cmd_help={"help": "Get Info Of The Chat!", "example": "{ch}chatinfo"},
 )
 async def owo_chat_info(client, message):
-    engine = message.Engine
-    s = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    s = await edit_or_reply(message, "`Trying To Get ChatInfo!`")
     ujwal = await client.get_chat(message.chat.id)
-    peer = await client.resolve_peer(message.chat.id)
-    online_ = await client.send(pyrogram.raw.functions.messages.GetOnlines(peer=peer))
     msg = "**Chat Info** \n\n"
     msg += f"**Chat-ID :** __{ujwal.id}__ \n"
     msg += f"**Verified :** __{ujwal.is_verified}__ \n"
     msg += f"**Is Scam :** __{ujwal.is_scam}__ \n"
     msg += f"**Chat Title :** __{ujwal.title}__ \n"
-    msg += f"**Users Online :** __{online_.onlines}__ \n"
     if ujwal.photo:
         msg += f"**Chat DC :** __{ujwal.dc_id}__ \n"
     if ujwal.username:
@@ -531,6 +516,7 @@ async def owo_chat_info(client, message):
     if ujwal.description:
         msg += f"**Chat Description :** __{ujwal.description}__ \n"
     msg += f"**Chat Members Count :** __{ujwal.members_count}__ \n"
+
     if ujwal.photo:
         kek = await client.download_media(ujwal.photo.big_file_id)
         await client.send_photo(message.chat.id, photo=kek, caption=msg)
@@ -548,44 +534,43 @@ async def owo_chat_info(client, message):
     },
 )
 async def purge(client, message):
-    engine = message.Engine
     start_time = time.time()
     message_ids = []
     purge_len = 0
-    event = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    me_m = client.me
+    event = await edit_or_reply(message, "`Starting To Purge Messages!`")
+    me_m = await client.get_me()
     if message.chat.type in ["supergroup", "channel"]:
         me_ = await message.chat.get_member(int(me_m.id))
         if not me_.can_delete_messages:
-            await event.edit(engine.get_string("NOT_ADMIN"))
+            await event.edit("`I Need Delete Permission To Do This!`")
             return
     if not message.reply_to_message:
-        await event.edit(engine.get_string("NEEDS_REPLY").format("Message To Purge."))
+        await event.edit("`Reply To Message To Purge!`")
         return
     async for msg in client.iter_history(
         chat_id=message.chat.id,
         offset_id=message.reply_to_message.message_id,
         reverse=True,
     ):
-        if msg.message_id != message.message_id:
-            purge_len += 1
-            message_ids.append(msg.message_id)
-            if len(message_ids) >= 100:
-                await client.delete_messages(
-                    chat_id=message.chat.id, message_ids=message_ids, revoke=True
-                )
-                message_ids.clear()
+        purge_len += 1
+        message_ids.append(msg.message_id)
+        if len(message_ids) >= 100:
+            await client.delete_messages(
+                chat_id=message.chat.id, message_ids=message_ids, revoke=True
+            )
+            message_ids.clear()
     if message_ids:
         await client.delete_messages(
             chat_id=message.chat.id, message_ids=message_ids, revoke=True
         )
     end_time = time.time()
     u_time = round(end_time - start_time)
-    await event.edit(
-        engine.get_string("PURGE_").format(purge_len, u_time)
+    h = await client.send_message(
+        message.chat.id,
+        f"**>> Flash Purge Done!** \n**>> Total Message Purged :** `{purge_len}` \n**>> Time Taken :** `{u_time}`",
     )
     await asyncio.sleep(3)
-    await event.delete()
+    await h.delete()
 
 
 @friday_on_cmd(
@@ -596,7 +581,6 @@ async def purge(client, message):
     },
 )
 async def delmsgs(client, message):
-    engine = message.Engine
     if not message.reply_to_message:
         await message.delete()
         return
@@ -607,7 +591,6 @@ async def delmsgs(client, message):
     )
     await message.delete()
 
-
 @friday_on_cmd(
     ["setgrppic", "gpic"],
     cmd_help={
@@ -616,25 +599,24 @@ async def delmsgs(client, message):
     },
 )
 async def magic_grps(client, message):
-    engine = message.Engine
-    msg_ = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    msg_ = await edit_or_reply(message, "`Please Wait!`")
     if not message.reply_to_message:
-        await msg_.edit(engine.get_string("NEEDS_REPLY").format("image"))
+        await msg_.edit("`Reply To Image Please?`")
         return
     me_ = await message.chat.get_member(int(client.me.id))
     if not me_.can_change_info:
-        await msg_.edit(engine.get_string("NOT_ADMIN"))
+        await msg_.edit("`I Need Delete Permission To Do This!`")
         return
     cool = await convert_to_image(message, client)
     if not cool:
-        await msg_.edit(engine.get_string("NEEDS_REPLY").format("a valid media"))
+        await msg_.edit("`Reply to a valid media first.`")
         return
     if not os.path.exists(cool):
-        await msg_.edit(engine.get_string("INVALID_MEDIA"))
+        await msg_.edit("`Invalid Media!`")
         return
     try:
         await client.set_chat_photo(message.chat.id, photo=cool)
     except BaseException as e:
         await msg_.edit(f"`Unable To Set Group Photo! TraceBack : {e}")
         return
-    await msg_.edit(engine.get_string("DONE_"))
+    await msg_.edit("`Done! Sucessfully Set This Pic As Chat Pic Of This Chat!")

@@ -15,7 +15,7 @@ async def approve_user(user_id):
     cd = await db_y.find_one({"_id": "PmPermit"})
     if cd:
         await db_y.update_one({"_id": "PmPermit"}, {"$push": {"user_id": user_id}})
-    else:
+    elif not cd:
         user_idc = [user_id]
         await db_y.insert_one({"_id": "PmPermit", "user_id": user_idc})
 
@@ -28,7 +28,10 @@ async def is_user_approved(user_id):
     sm = await db_y.find_one({"_id": "PmPermit"})
     if sm:
         kek = list(sm.get("user_id"))
-        return user_id in kek
+        if user_id in kek:
+            return True
+        else:
+            return False
     else:
         return False
 

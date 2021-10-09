@@ -7,12 +7,7 @@
 # All rights reserved.
 
 from main_startup.core.decorators import friday_on_cmd
-from main_startup.helper_func.basic_helpers import (
-    edit_or_reply,
-    edit_or_send_as_file,
-    get_text,
-    get_user,
-)
+from main_startup.helper_func.basic_helpers import edit_or_reply, get_text, edit_or_send_as_file, get_user
 
 
 @friday_on_cmd(
@@ -23,23 +18,22 @@ from main_startup.helper_func.basic_helpers import (
     },
 )
 async def bleck_name(client, message):
-    engine = message.Engine
-    owo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    owo = await edit_or_reply(message, "`Updating FirstName!`")
     new_firstname = get_text(message)
     if not new_firstname:
-        await owo.edit(engine.get_string("INPUT_REQ").format("Firstname"))
+        await owo.edit("`Give A Input :/`")
         return
     if len(new_firstname) > 64:
-        await owo.edit(engine.get_string("NEEDS_C_INPUT"))
+        await owo.edit("`Bruh, TG Will Not Allow That :(`")
         return
     try:
         await client.update_profile(first_name=new_firstname)
     except BaseException as e:
         await owo.edit(
-            engine.get_string("FIRST_NAME_CHANGE_FAILED").format("FirstName", e)
+            f"`[Failed] - Unable To Update Firstname` \n**TraceBack :** `{e}`"
         )
         return
-    await owo.edit(engine.get_string("FIRST_NAME_CHANGED").format("FirstName", new_firstname))
+    await owo.edit(f"`Firstname Sucessfully Changed To {new_firstname} !`")
 
 
 @friday_on_cmd(
@@ -47,21 +41,20 @@ async def bleck_name(client, message):
     cmd_help={"help": "Change Your Account Bio!", "example": "{ch}bio (new bio)"},
 )
 async def bleck_bio(client, message):
-    engine = message.Engine
-    owo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    owo = await edit_or_reply(message, "`Updating Bio!`")
     new_bio = get_text(message)
     if not new_bio:
-        await owo.edit(engine.get_string("INPUT_REQ").format("Bio"))
+        await owo.edit("`Give A Input :/`")
         return
     if len(new_bio) > 70:
-        await owo.edit(engine.get_string("NEEDS_C_INPUT"))
+        await owo.edit("`Bruh, TG Will Not Allow That :(`")
         return
     try:
         await client.update_profile(bio=new_bio)
     except BaseException as e:
-        await owo.edit(engine.get_string("FIRST_NAME_CHANGE_FAILED").format("Bio", e))
+        await owo.edit(f"`[Failed] - Unable To Update Bio` \n**TraceBack :** `{e}`")
         return
-    await owo.edit(engine.get_string("FIRST_NAME_CHANGED").format("Bio", new_bio))
+    await owo.edit(f"`Bio Sucessfully Changed To {new_bio} !`")
 
 
 @friday_on_cmd(
@@ -72,20 +65,19 @@ async def bleck_bio(client, message):
     },
 )
 async def bleck_username(client, message):
-    engine = message.Engine
-    owo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    owo = await edit_or_reply(message, "`Updating Username!`")
     new_username = get_text(message)
     if not new_username:
-        await owo.edit(engine.get_string("INPUT_REQ").format("Username"))
+        await owo.edit("`Give A Input :/`")
         return
     try:
         await client.update_username(new_username)
     except BaseException as e:
         await owo.edit(
-            engine.get_string("FIRST_NAME_CHANGE_FAILED").format("Username", e)
+            f"`[Failed] - Unable To Update Username` \n**TraceBack :** `{e}`"
         )
         return
-    await owo.edit(engine.get_string("FIRST_NAME_CHANGED").format("Username", new_username))
+    await owo.edit(f"`Username Sucessfully Changed To {new_username} !`")
 
 
 @friday_on_cmd(
@@ -96,60 +88,22 @@ async def bleck_username(client, message):
     },
 )
 async def bleck_name(client, message):
-    engine = message.Engine
-    owo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    owo = await edit_or_reply(message, "`Updating LastName!`")
     new_lastname = get_text(message)
     if not new_lastname:
-        await owo.edit(engine.get_string("INPUT_REQ").format("Last Name"))
+        await owo.edit("`Give A Input :/`")
         return
     if len(new_lastname) > 64:
-        await owo.edit(engine.get_string("NEEDS_C_INPUT"))
+        await owo.edit("`Bruh, TG Will Not Allow That :(`")
         return
     try:
         await client.update_profile(last_name=new_lastname)
     except BaseException as e:
         await owo.edit(
-            engine.get_string("FIRST_NAME_CHANGE_FAILED").format("LastName", e)
+            f"`[Failed] - Unable To Update Lastname` \n**TraceBack :** `{e}`"
         )
         return
-    await owo.edit(engine.get_string("FIRST_NAME_CHANGED").format("LastName", new_lastname))
-    
-    
-@friday_on_cmd(
-    ["join"],
-    cmd_help={
-        "help": "Join A Chat Easily.",
-        "example": "{ch}join (chat link or username)",
-    },
-)
-async def join_(client, message):
-    engine = message.Engine
-    owo = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    input_ = get_text(message)
-    if not input_:
-        await owo.edit(engine.get_string("INPUT_REQ").format("Chat ID"))
-        return
-    try:
-        await client.join_chat(input_)
-    except BaseException as e:
-        await owo.edit(
-            engine.get_string("FAILED_TO_JOIN").format(e)
-        )
-        return
-    await owo.edit(engine.get_string("JOINED"))
-
-@friday_on_cmd(
-    ["leave"],
-    group_only=True,
-    cmd_help={
-        "help": "Leave Chat Easily.",
-        "example": "{ch}leave",
-    },
-)
-async def leave_(client, message):
-    engine = message.Engine
-    await edit_or_reply(message, "`GOODBYECRUELGROUP - *leaves*`")
-    await client.leave_chat(message.chat.id)
+    await owo.edit(f"`Lastname Sucessfully Changed To {new_lastname} !`")
 
 
 @friday_on_cmd(
@@ -160,17 +114,16 @@ async def leave_(client, message):
     },
 )
 async def bleck_pic(client, message):
-    engine = message.Engine
-    owo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    owo = await edit_or_reply(message, "`Updating PPic!`")
     if not message.reply_to_message:
-        await owo.edit(engine.get_string("NEEDS_REPLY").format("Video / Pic"))
+        await owo.edit("`Reply To Image / Video To Set As PPic`")
         return
     if not (
         message.reply_to_message.video
         or message.reply_to_message.animation
         or message.reply_to_message.photo
     ):
-        await owo.edit(engine.get_string("NEEDS_REPLY").format("Video / Pic"))
+        await owo.edit("`Reply To Image / Video To Set As PPic`")
         return
     is_video = False
     if message.reply_to_message.video or message.reply_to_message.animation:
@@ -182,9 +135,9 @@ async def bleck_pic(client, message):
         else:
             await client.set_profile_photo(photo=ppics)
     except BaseException as e:
-        await owo.edit(engine.get_string("UPDATE_PIC").format(e))
+        await owo.edit(f"`[Failed] - Unable To Update PPic` \n**TraceBack :** `{e}`")
         return
-    await owo.edit(engine.get_string("PIC_DONE"))
+    await owo.edit("`Sucessfully, Updated Profile Pic!`")
 
 
 @friday_on_cmd(
@@ -196,84 +149,78 @@ async def bleck_pic(client, message):
     },
 )
 async def create_poll(client, message):
-    engine = message.Engine
-    msg = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    msg = await edit_or_reply(message, "`Creating Poll!`")
     poll_ = get_text(message)
     if not poll_:
-        await msg.edit(engine.get_string("REQ_POLL"))
+        await msg.edit("`Give Me Question & Options! See Help For More`")
         return
-    if "|" not in poll_:
-        await msg.edit(engine.get_string("A_POLL_NEEDS"))
+    if not "|" in poll_:
+        await msg.edit("`Give Me Options :/`")
         return
     poll_q, poll_options = poll_.split("|")
-    if "," not in poll_options:
-        await msg.edit(engine.get_string("A_POLL_NEEDS"))
+    if not ',' in poll_options:
+        await msg.edit("`A Poll Needs 1+ Options!`")
         return
     option_s = poll_options.split(",")
     await client.send_poll(message.chat.id, question=poll_q, options=option_s)
     await msg.delete()
-
 
 @friday_on_cmd(
     ["dump"],
     cmd_help={
         "help": "Get Pyrogram Message Dumbs!",
         "example": "{ch}dump",
-    },
+    }
 )
 async def dumb_er(client, message):
-    engine = message.Engine
-    ow = await edit_or_reply(message, engine.get_string("PROCESSING"))
-    m_sg = message.reply_to_message or message
+    if message.reply_to_message:
+        m_sg = message.reply_to_message
+    else:
+        m_sg = message
     owo = f"{m_sg}"
-    await edit_or_send_as_file(owo, ow, client, "Json-Dump", "Dump", "md")
-
-
+    await edit_or_send_as_file(owo, message, client, "Json-Dump", "Dump", "md")
+    
 @friday_on_cmd(
     ["purgeme"],
     cmd_help={
         "help": "Purge Your Own Message Until Given Limit!",
         "example": "{ch}purgeme 10",
-    },
+    }
 )
 async def pur_ge_me(client, message):
-    engine = message.Engine
-    nice_p = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    nice_p = await edit_or_reply(message, "`Processing...`")
     msg_ids = []
     to_purge = get_text(message)
     if not to_purge:
-        nice_p.edit(engine.get_string("TO_PURGE"))
+        nice_p.edit("`Give No Of Message To Purge :/`")
         return
     if not to_purge.isdigit():
-        nice_p.edit(engine.get_string("TO_PURGE"))
+        nice_p.edit("`Give No Of Message To Purge :/`")
         return
     async for msg in client.search_messages(
         message.chat.id, query="", limit=int(to_purge), from_user="me"
     ):
-        if message.message_id != msg.message_id:
-            msg_ids.append(msg.message_id)
-            if len(msg_ids) == 100:
-                await client.delete_messages(
-                    chat_id=message.chat.id, message_ids=msg_ids, revoke=True
-                )
-                msg_ids.clear()
+        msg_ids.append(msg.message_id)
+        if len(msg_ids) >= 100:
+            await client.delete_messages(
+                chat_id=message.chat.id, message_ids=msg_ids, revoke=True
+            )
+            msg_ids.clear()
     if msg_ids:
         await client.delete_messages(
             chat_id=message.chat.id, message_ids=msg_ids, revoke=True
         )
-    await nice_p.edit(PURGED_MY_MSG.format(to_purge))
-
+    await client.send_message(message.chat.id, f"`Purged {to_purge} Messages!`")
 
 @friday_on_cmd(
     ["invite", "add"],
     cmd_help={
         "help": "Add Users To Channel / Groups!",
         "example": "{ch}invite @Midhun_xD @chsaiujwal @meisnub",
-    },
+    }
 )
 async def add_user_s_to_group(client, message):
-    engine = message.Engine
-    mg = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    mg = await edit_or_reply(message, "`Adding Users!`")
     user_s_to_add = get_text(message)
     if not user_s_to_add:
         await mg.edit("`Give Me Users To Add! Check Help Menu For More Info!`")
@@ -282,28 +229,26 @@ async def add_user_s_to_group(client, message):
     try:
         await client.add_chat_members(message.chat.id, user_list, forward_limit=100)
     except BaseException as e:
-        await mg.edit(engine.get_string("UNABLE_TO_ADD_USER").format(e))
+        await mg.edit(f"`Unable To Add Users! \nTraceBack : {e}`")
         return
-    await mg.edit(engine.get_string("ADDED_USER").format(len(user_list)))
-
-
+    await mg.edit(f"`Sucessfully Added {len(user_list)} To This Group / Channel!`")
+    
 @friday_on_cmd(
     ["a2c"],
     cmd_help={
         "help": "Add Users To Your Contacts!",
         "example": "{ch}a2c @Meisnub",
-    },
+    }
 )
 async def add_user_s_to_contact(client, message):
-    engine = message.Engine
-    msg_ = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    msg_ = await edit_or_reply(message, "`Please Wait!`")
     text_ = get_text(message)
     userk = get_user(message, text_)[0]
     try:
         user_ = await client.get_users(userk)
-    except BaseException as e:
-        await msg_.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await msg_.edit(f"`404 : Unable To Get To This User!`")
         return
     custom_name = get_text(message) or user_.first_name
     await client.add_contact(user_.id, custom_name)
-    await msg_.edit(engine.get_string("ADDED_CONTACT").format(user_.first_name))
+    await msg_.edit(f"`Added {user_.first_name} To Contacts!`")

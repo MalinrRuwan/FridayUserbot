@@ -7,7 +7,6 @@
 # All rights reserved.
 
 import pyrogram
-
 from main_startup.core.decorators import friday_on_cmd
 from main_startup.helper_func.basic_helpers import edit_or_reply, edit_or_send_as_file
 
@@ -20,14 +19,18 @@ from main_startup.helper_func.basic_helpers import edit_or_reply, edit_or_send_a
     },
 )
 async def pabloescobar(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    pablo = await edit_or_reply(message, "`Please Wait!`")
     channels = await client.send(
         pyrogram.raw.functions.channels.GetAdminedPublicChannels()
     )
     C = channels.chats
-    output_stre = "".join(f"{x.title}\n@{x.username}\n\n" for x in C)
-    output_str = engine.get_string("IAM_ADMIN").format("output_stre")
+    output_stre = ""
+    for x in C:
+        output_stre += f"{x.title}\n@{x.username}\n\n"
+    output_str = f"""I am Admin In All These Groups And Channels
+{output_stre}
+"""
     await edit_or_send_as_file(
         output_str, pablo, client, "Your Admin Chats", "admin_chat"
     )
+    

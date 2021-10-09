@@ -45,7 +45,10 @@ async def num_blacklist_triggers_chat(chat_id):
 
 async def is_blacklist_in_db(chat_id, trigger):
     m = await blacklist.find_one({"chat_id": chat_id, "trigger": trigger})
-    return bool(m)
+    if m:
+        return True
+    else:
+        return False
 
 
 async def blacklists_del(chat_id):

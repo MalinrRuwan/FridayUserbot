@@ -6,8 +6,6 @@
 #
 # All rights reserved.
 
-import logging
-
 from database.broadcast_db import (
     add_broadcast_chat,
     get_all_broadcast_chats,
@@ -16,7 +14,7 @@ from database.broadcast_db import (
 )
 from main_startup.core.decorators import friday_on_cmd
 from main_startup.helper_func.basic_helpers import edit_or_reply, get_text
-
+import logging
 
 @friday_on_cmd(
     ["badd"],
@@ -26,18 +24,17 @@ from main_startup.helper_func.basic_helpers import edit_or_reply, get_text
     },
 )
 async def badd(client, message):
-    engine = message.Engine
-    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    pablo = await edit_or_reply(message, "`Processing..`")
     bd = get_text(message)
     if not bd:
-        await pablo.edit(engine.get_string("INPUT_REQ").format("Chat ID"))
+        await pablo.edit("`Check Help Menu On How To Use This Command!`")
         return
+    sed = 0
+    oks = 0
+    zxz = ["channel", "supergroup"]
+    nd = ["creator", "administrator"]
     if bd.lower() == "all":
-        await pablo.edit(engine.get_string("BROADCAST_2"))
-        sed = 0
-        oks = 0
-        zxz = ["channel", "supergroup"]
-        nd = ["creator", "administrator"]
+        await pablo.edit("`Adding All Channel TO DB.`")
         async for dialog in client.iter_dialogs():
             if dialog.chat.type in zxz:
                 x = await client.get_chat_member(dialog.chat.id, message.from_user.id)
@@ -48,20 +45,18 @@ async def badd(client, message):
                     else:
                         sed += 1
         await pablo.edit(
-            engine.get_string("BROADCAST_1").format(oks, oks+sed)
+            f"Successfully Added {oks} Groups/Channels to DB.\nTotal Groups/Channels in dB {oks+sed} "
         )
     else:
-        chnl_id = await get_final_id(bd, client)
-        if not chnl_id:
-            await pablo.edit(engine.get_string('CHAT_NOT_IN_DB'))
-            return
-        chnl_id = int(chnl_id)
-        if await is_broadcast_chat_in_db(chnl_id):
-            await pablo.edit(engine.get_string("INVALID_CHAT_ID"))
-            return
-        await add_broadcast_chat(chnl_id)
-        await pablo.edit(engine.get_string("BROADCAST_3").format(bd))
-
+            chnl_id = await get_final_id(bd, client)
+            if not chnl_id:
+                await pablo.edit("`Invalid Channel Id/Username`")
+                return
+            if await is_broadcast_chat_in_db(chnl_id):
+                await pablo.edit("`This Channel is Already In dB!`")
+                return
+            await add_broadcast_chat(chnl_id)
+            await pablo.edit(f"`Successfully Added {bd} in dB!`")
 
 @friday_on_cmd(
     ["brm"],
@@ -71,31 +66,29 @@ async def badd(client, message):
     },
 )
 async def brm(client, message):
-    engine = message.Engine
     pablo = await edit_or_reply(message, "`Processing..`")
     bd = get_text(message)
+    Jill = 0
     if not bd:
-        await pablo.edit(engine.get_string("INPUT_REQ").format("Chat ID"))
+        await pablo.edit("`Check Help Menu On How To Use This Command!`")
         return
     if bd.lower() == "all":
-        await pablo.edit(engine.get_string(""))
+        await pablo.edit("`Removing All Channel From DB.`")
         all = await get_all_broadcast_chats()
-        Jill = 0
         for chnnl in all:
             await rmbroadcast_chat(chnnl["chat_id"])
             Jill += 1
-        await pablo.edit(engine.get_string("BROADCAST_5").format(Jill))
+        await pablo.edit(f"Successfully Removed {Jill} Groups/Channels from dB")
     else:
         chnl_id = await get_final_id(bd, client)
         if not chnl_id:
-            await pablo.edit(engine.get_string("INVALID_CHAT_ID"))
+            await pablo.edit("`Invalid Channel Id/Username`")
             return
-        chnl_id = int(chnl_id)
         if not await is_broadcast_chat_in_db(chnl_id):
-            await pablo.edit(engine.get_string("FILTER_1").format("BROADCAST", bd))
+            await pablo.edit("`This Channel is Not In dB!`")
             return
         await add_broadcast_chat(chnl_id)
-        await pablo.edit(engine.get_string("BROADCAST_4").format(bd))
+        await pablo.edit(f"`Successfully Added {bd} in dB!`")
 
 
 @friday_on_cmd(
@@ -106,18 +99,17 @@ async def brm(client, message):
     },
 )
 async def broadcast(client, message):
-    engine = message.Engine
     pablo = await edit_or_reply(
-        message, engine.get_string("BROADCAST_6")
+        message, "**Fine. Broadcasting in Progress. Kindly Wait !**"
     )
     leat = await get_all_broadcast_chats()
     S = 0
     F = 0
     if len(leat) == 0:
-        await pablo.edit(engine.get_string("BROADCAST_7"))
+        await pablo.edit("No Channel Or Group Found On Database. Please Check Again")
         return
     if not message.reply_to_message:
-        await pablo.edit(engine.get_string("REPLY_MSG"))
+        await pablo.edit("Reply To A Message To Broadcast")
         return
     for lolol in leat:
         try:
@@ -131,18 +123,17 @@ async def broadcast(client, message):
             logging.error(f"[Broadcast] {e}")
             F += 1
     await pablo.edit(
-        engine.get_string("BROADCAST_8").format(S, F)
+        f"Successfully Broadcasted Message in {S} groups/channels. Failed in {F}"
     )
-
 
 async def get_final_id(query, client):
     is_int = True
     try:
         in_t = int(query)
-    except ValueError:
+    except:
         is_int = False
     chnnl = in_t if is_int else str(query)
     try:
-        return int((await client.get_chat(chnnl)).id)
+        return (await client.get_chat(chnnl)).id
     except:
         return None

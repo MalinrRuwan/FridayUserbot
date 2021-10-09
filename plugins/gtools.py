@@ -21,9 +21,8 @@ from main_startup.helper_func.basic_helpers import (
     iter_chats,
 )
 from main_startup.helper_func.logger_s import LogIt
-from plugins import devs_id
-from database.sudodb import sudo_list
 
+from plugins import devs_id
 
 @friday_on_cmd(
     ["gmute"],
@@ -33,28 +32,26 @@ from database.sudodb import sudo_list
     },
 )
 async def gmute_him(client, message):
-    AFS = await sudo_list()
-    engine = message.Engine
-    g = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    g = await edit_or_reply(message, "`Processing..`")
     text_ = get_text(message)
     user, reason = get_user(message, text_)
     if not user:
-        await g.edit(engine.get_string("REPLY_TO_USER").format("gmute"))
+        await g.edit("`Reply To User Or Mention To Gmute Him`")
         return
     try:
         userz = await client.get_users(user)
     except:
-        await g.edit(engine.get_string("USER_MISSING").format("User Doesn't Exists In This Chat !"))
+        await g.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     if not reason:
         reason = "Just_Gmutted!"
-    if userz.id == (client.me).id:
-        await g.edit(engine.get_string("TF_DO_IT").format("Gmute"))
+    if userz.id == (await client.get_me()).id:
+        await g.edit("`Oh, This is So Funny Btw :/`")
         return
     if userz.id in devs_id:
         await g.edit("`Sadly, I Can't Do That!`")
         return
-    if userz.id in AFS:
+    if userz.id in Config.AFS:
         await g.edit("`Sudo Users Can't Be Gmutted! Remove Him And Try Again!`")
         return
     if await is_gmuted(userz.id):
@@ -75,23 +72,21 @@ async def gmute_him(client, message):
     },
 )
 async def gmute_him(client, message):
-    AFS = await sudo_list()
-    engine = message.Engine
-    ug = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    ug = await edit_or_reply(message, "`Processing..`")
     text_ = get_text(message)
     user_ = get_user(message, text_)[0]
     if not user_:
-        await ug.edit(engine.get_string("REPLY_TO_USER").format("UN-gmute"))
+        await ug.edit("`Reply To User Or Mention To Un-Gmute Him`")
         return
     try:
         userz = await client.get_users(user_)
-    except BaseException as e:
-        await ug.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await ug.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
-    if userz.id == (client.me).id:
-        await ug.edit(engine.get_string("TF_DO_IT").format("UN-gmute"))
+    if userz.id == (await client.get_me()).id:
+        await ug.edit("`Oh, This is So Funny Btw :/`")
         return
-    if userz.id in AFS:
+    if userz.id in Config.AFS:
         await ug.edit("`Sudo Users Can't Be Un-Gmutted! Remove Him And Try Again!`")
         return
     if not await is_gmuted(userz.id):
@@ -112,29 +107,27 @@ async def gmute_him(client, message):
     },
 )
 async def gbun_him(client, message):
-    AFS = await sudo_list()
-    engine = message.Engine
-    gbun = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    gbun = await edit_or_reply(message, "`Processing..`")
     text_ = get_text(message)
     user, reason = get_user(message, text_)
     failed = 0
     if not user:
-        await gbun.edit(engine.get_string("REPLY_TO_USER").format("gban"))
+        await gbun.edit("`Reply To User Or Mention To GBan Him`")
         return
     try:
         userz = await client.get_users(user)
-    except BaseException as e:
-        await gbun.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await gbun.edit(f"`404 : User Doesn't Exists In This Chat !`")
         return
     if not reason:
         reason = "Private Reason!"
-    if userz.id == (client.me).id:
-        await gbun.edit(engine.get_string("TF_DO_IT").format("GBan"))
+    if userz.id == (await client.get_me()).id:
+        await gbun.edit("`Oh, This is So Funny Btw :/`")
         return
     if userz.id in devs_id:
         await g.edit("`Sadly, I Can't Do That!`")
         return
-    if userz.id in AFS:
+    if userz.id in Config.AFS:
         await gbun.edit("`Sudo Users Can't Be Gbanned! Remove Him And Try Again!`")
         return
     if await gban_info(userz.id):
@@ -146,7 +139,7 @@ async def gbun_him(client, message):
     if not chat_dict:
         gbun.edit("`You Have No Chats! So Sad`")
         return
-    await gbun.edit(engine.get_string("GBAN_START"))
+    await gbun.edit("`Starting GBans Now!`")
     for ujwal in chat_dict:
         try:
             await client.kick_chat_member(ujwal, int(userz.id))
@@ -167,22 +160,20 @@ async def gbun_him(client, message):
     },
 )
 async def ungbun_him(client, message):
-    AFS = await sudo_list()
-    engine = message.Engine
-    ungbun = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    ungbun = await edit_or_reply(message, "`Processing..`")
     text_ = get_text(message)
     user = get_user(message, text_)[0]
     failed = 0
     if not user:
-        await ungbun.edit(engine.get_string("REPLY_TO_USER").format("Un-Gban"))
+        await ungbun.edit("`Reply To User Or Mention To Un-GBan Him`")
         return
     try:
         userz = await client.get_users(user)
-    except BaseException as e:
-        await ungbun.edit(engine.get_string("USER_MISSING").format(e))
+    except:
+        await ungbun.edit(f"`404 : User Doesn't Exists!`")
         return
-    if userz.id == (client.me).id:
-        await ungbun.edit(engine.get_string("TF_DO_IT").format("Un-GBan"))
+    if userz.id == (await client.get_me()).id:
+        await ungbun.edit("`Oh, This is So Funny Btw :/`")
         return
     if not await gban_info(userz.id):
         await ungbun.edit("`Un-Gban A Ungbanned User? Seriously? :/`")
@@ -207,32 +198,32 @@ async def ungbun_him(client, message):
 
 
 @listen(filters.incoming & ~filters.me & ~filters.user(Config.AFS))
-async def watch(client, message):
-    AFS = await sudo_list()
+async def delete_user_msgs(client, message):
     if not message:
-        return
+        message.continue_propagation()
     if not message.from_user:
-        return
+        message.continue_propagation()
     user = message.from_user.id
-    if not user:
-        return
     if await is_gmuted(user):
         try:
             await message.delete()
         except:
-            return
+            message.continue_propagation()
     if await gban_info(user):
-        if message.chat.type == "private":
-            return
+        me_ = await message.chat.get_member(int(client.me.id))
+        if not me_.can_restrict_members:
+            message.continue_propagation()
         try:
-            await message.chat.kick_member(int(user))
-        except BaseException:
-            return
+            await client.kick_chat_member(message.chat.id, int(user))
+        except:
+            message.continue_propagation()
         await client.send_message(
             message.chat.id,
             f"**#GbanWatch** \n**Chat ID :** `{message.chat.id}` \n**User :** `{user}` \n**Reason :** `{await gban_info(user)}`",
         )
-    
+    message.continue_propagation()
+
+
 @friday_on_cmd(
     ["gbanlist"],
     cmd_help={
@@ -241,17 +232,15 @@ async def watch(client, message):
     },
 )
 async def give_glist(client, message):
-    engine = message.Engine
     oof = "**#GBanList** \n\n"
-    glist = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    glist = await edit_or_reply(message, "`Processing..`")
     list_ = await gban_list()
     if len(list_) == 0:
         await glist.edit("`No User is Gbanned Till Now!`")
         return
     for lit in list_:
         oof += f"**User :** `{lit['user']}` \n**Reason :** `{lit['reason']}` \n\n"
-    await edit_or_send_as_file(oof, glist, client, "GbanList", "Gban-List")
-
+    await edit_or_send_as_file(oof, message, client, "GbanList", "Gban-List")
 
 @friday_on_cmd(
     ["gbroadcast"],
@@ -261,23 +250,20 @@ async def give_glist(client, message):
     },
 )
 async def gbroadcast(client, message):
-    engine = message.Engine
-    msg_ = await edit_or_reply(message, engine.get_string("PROCESSING"))
+    msg_ = await edit_or_reply(message, "`Fetching Your ChatList!`")
     failed = 0
     if not message.reply_to_message:
-        await msg_.edit(engine.get_string("NEEDS_REPLY").format("Message"))
+        await msg_.edit("`Reply To Message Boss!`")
         return
     chat_dict = await iter_chats(client)
     chat_len = len(chat_dict)
     await msg_.edit("`Now Sending To All Chats Possible!`")
     if not chat_dict:
-        msg_.edit(engine.get_string("NO_CHATS"))
+        msg_.edit("`You Have No Chats! So Sad`")
         return
     for c in chat_dict:
         try:
-            msg = await message.reply_to_message.copy(c)
+            msg = message.reply_to_message.copy(c)
         except:
             failed += 1
-    await msg_.edit(
-        engine.get_string("BROADCAST_8").format(chat_len-failed, failed)
-    )
+    await msg_.edit(f"`Message Sucessfully Send To {chat_len-failed} Chats! Failed In {failed} Chats.`")

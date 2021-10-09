@@ -21,12 +21,16 @@ async def rmchatbotuser(user_id):
 
 
 async def get_all_chatbotusers():
-    return [ko async for ko in chatbot_user_db.find()]
+    lol = [ko async for ko in chatbot_user_db.find()]
+    return lol
 
 
 async def is_chatbotuser_in_db(user_id):
     k = await chatbot_user_db.find_one({"user_id": user_id})
-    return bool(k)
+    if k:
+        return True
+    else:
+        return False
 
 
 async def add_blacklisted_user(user_id):
@@ -39,4 +43,7 @@ async def rm_blacklisted_user(user_id):
 
 async def is_user_blacklisted(user_id):
     b = await cbb.find_one({"user_id": user_id})
-    return bool(b)
+    if b:
+        return True
+    else:
+        return False
