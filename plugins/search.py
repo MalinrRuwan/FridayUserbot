@@ -23,15 +23,16 @@ from main_startup.helper_func.basic_helpers import edit_or_reply, get_text
     cmd_help={"help": "duckduckgo searcher!", "example": "{ch}ddg (query to search)"},
 )
 async def duckduckgo(client, message):
-    pablo = await edit_or_reply(message, "`Processing..`")
+    engine = message.Engine
+    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
     query = get_text(message)
     if not query:
-        await pablo.edit("Invalid Command Syntax, Please Check Help Menu To Know More!")
+        await pablo.edit(engine.get_string("INPUT_REQ").format("query"))
         return
     sample_url = "https://duckduckgo.com/?q={}".format(query.replace(" ", "+"))
     link = sample_url.rstrip()
     await pablo.edit(
-        "Let me 🦆 DuckDuckGo that for you:\n🔎 [{}]({})".format(query, link)
+        engine.get_string("DUCK_DUCK_GO").format(query, link)
     )
 
 
@@ -40,10 +41,11 @@ async def duckduckgo(client, message):
     cmd_help={"help": "Google Searcher!", "example": "{ch}gs (query to search)"},
 )
 async def grs(client, message):
-    pablo = await edit_or_reply(message, "`Processing..`")
+    engine = message.Engine
+    pablo = await edit_or_reply(message, engine.get_string("PROCESSING"))
     query = get_text(message)
     if not query:
-        await pablo.edit("Invalid Command Syntax, Please Check Help Menu To Know More!")
+        await pablo.edit(engine.get_string("INPUT_REQ").format("query"))
         return
     query = urllib.parse.quote_plus(query)
     number_result = 8
@@ -80,8 +82,10 @@ async def grs(client, message):
     for x in to_remove:
         del titles[x]
         del descriptions[x]
-    msg = ""
-    
-    for tt, liek, d in zip(titles, clean_links, descriptions):
-        msg += f"[{tt}]({liek})\n`{d}`\n\n"
+    msg = "".join(
+        f"[{tt}]({liek})\n`{d}`\n\n"
+        for tt, liek, d in zip(titles, clean_links, descriptions)
+    )
+
+
     await pablo.edit("**Search Query:**\n`" + query + "`\n\n**Results:**\n" + msg)
